@@ -269,11 +269,15 @@ function location_manager($telegram,$user_id,$chat_id,$location)
 	$ciclo=0;
 
 			$result=0;
-
+$csv=[];
 			$ciclo=0;
 //if ($count >40) $count=40;
 foreach ($parsed_json->{'features'} as $i => $value) {
+	$filter=$parsed_json->{'features'}[$i]->{'attributes'}->{'GeogAreaName'};
 
+
+if (strpos(strtoupper($filter),strtoupper($comune)) !== false ){
+$ciclo++;
 		$lat10=floatval($parsed_json->{'features'}[$i]->{'geometry'}->{'y'});
 		$long10=floatval($parsed_json->{'features'}[$i]->{'geometry'}->{'x'});
 		$theta = floatval($lon)-floatval($long10);
@@ -293,42 +297,63 @@ foreach ($parsed_json->{'features'} as $i => $value) {
 		$csv[$i][100]= array("distance" => "value");
 
 		$csv[$i][100]= $data;
+		$csv[$i][101]= array("AccomDesc" => "value");
 
+		$csv[$i][101]= $parsed_json->{'features'}[$i]->{'attributes'}->{'AccomDesc'};
 
-				$filter=$parsed_json->{'features'}[$i]->{'attributes'}->{'GeogAreaName'};
+		$csv[$i][102]= array("Tipology" => "value");
 
+		$csv[$i][102]= $parsed_json->{'features'}[$i]->{'attributes'}->{'Tipology'};
 
-		if (strpos(strtoupper($filter),strtoupper($comune)) !== false ){
-						$ciclo++;
+		$csv[$i][103]= array("ESRI_OID" => "value");
 
-		$homepage = "Nome: <b>".$parsed_json->{'features'}[$i]->{'attributes'}->{'AccomDesc'}."</b>\n";
-		$homepage .= "Tipologia: <b>".$parsed_json->{'features'}[$i]->{'attributes'}->{'Tipology'}."</b>\n";
-		$homepage .= "Clicca per dettagli: /".$parsed_json->{'features'}[$i]->{'attributes'}->{'ESRI_OID'}."\n";
+		$csv[$i][103]= $parsed_json->{'features'}[$i]->{'attributes'}->{'ESRI_OID'};
+
+		$csv[$i][104]= array("lon" => "value");
+
+		$csv[$i][104]= $parsed_json->{'features'}[$i]->{'geometry'}->{'y'};
+		$csv[$i][105]= array("lat" => "value");
+
+		$csv[$i][105]= $parsed_json->{'features'}[$i]->{'geometry'}->{'x'};
+
+}
+}
+
+sort($csv);
+
+$ciclo2=0;
+foreach ($csv as $i => $value) {
+
+$ciclo2++;
+		$homepage = "Nome: <b>".$csv[$i][101]."</b>\n";
+		$homepage .= "Tipologia: <b>".$csv[$i][102]."</b>\n";
+		$homepage .= "Clicca per dettagli: /".$csv[$i][103]."\n";
 		$homepage .="Dista: ".$csv[$i][100]."\n";
 		//	$homepage .= "http://www.openstreetmap.org/?mlat=".$csv[$i][12]."&mlon=".$csv[$i][13]."#map=19/".$csv[$i][12]."/".$csv[$i][13];
-		$location2 ="http://map.project-osrm.org/?z=14&center=40.351025%2C18.184133&loc=".$lat."%2C".$lon."&loc=".$parsed_json->{'features'}[$i]->{'geometry'}->{'y'}."%2C".$parsed_json->{'features'}[$i]->{'geometry'}->{'x'}."&hl=en&ly=&alt=&df=&srv=";
+		$location2 ="http://map.project-osrm.org/?z=14&center=40.351025%2C18.184133&loc=".$lat."%2C".$lon."&loc=".$csv[$i][104]."%2C".$csv[$i][105]."&hl=en&ly=&alt=&df=&srv=";
 		$homepage .="<a href='".$location2."'>Portami QUI</a>";
 
 
 		$homepage .="\n____________";
-		if ($ciclo>=20){
-			$location="Troppe strutture per questa ricerca, ti ho mostrato le prime 20.\nSe proprio vuoi averle tutte <b>(potrebbero essere centinaia ATTENZIONE!!)</b>, allora digita la località anteponendo il carattere !.\nEsempio !ragusa";
-			$content = array('chat_id' => $chat_id, 'text' => $location,'disable_web_page_preview'=>true,'parse_mode'=>"HTML");
-			$telegram->sendMessage($content);
-		$this->create_keyboard_temp($telegram,$chat_id);
-			exit;
-		}
 		$chunks = str_split($homepage, self::MAX_LENGTH);
 		foreach($chunks as $chunk) {
 		$content = array('chat_id' => $chat_id, 'text' => $chunk,'disable_web_page_preview'=>true,'parse_mode'=>"HTML");
 		$telegram->sendMessage($content);
 
 		}
-						}
+		if ($ciclo2>=30){
+			$location="Ti ho mostrato le prime 30 distanti in maniera crescente dalla tua posizione.";
+			$content = array('chat_id' => $chat_id, 'text' => $location,'disable_web_page_preview'=>true,'parse_mode'=>"HTML");
+			$telegram->sendMessage($content);
+		$this->create_keyboard_temp($telegram,$chat_id);
+			exit;
+		}
 
 						}
 
-						if ($ciclo==0){
+
+
+						if ($ciclo2==0){
 							$location="Nessuna struttura trovata";
 							$content = array('chat_id' => $chat_id, 'text' => $location,'disable_web_page_preview'=>true);
 							$telegram->sendMessage($content);
