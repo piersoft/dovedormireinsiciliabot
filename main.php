@@ -32,10 +32,10 @@ function start($telegram,$update)
 	if (strpos($text,'@dovedormireinsicilia_bot') !== false) $text=str_replace("@dovedormireinsicilia_bot ","",$text);
 
 	if ($text == "/start" || $text == "©️ Informazioni") {
-		$img = curl_file_create('sicilia.png','image/png');
+		$img = curl_file_create('DoveDormireSicilia_400px.png','image/png');
 		$contentp = array('chat_id' => $chat_id, 'photo' => $img);
 		$telegram->sendPhoto($contentp);
-		$reply = "Benvenuto. Per ricercare una struttura ricettiva della Regione Siciliana, censita dal Dipartimento regionale del turismo dello sport e dello spettacolo, digita il nome del Comune oppure clicca sulla graffetta (📎) e poi 'posizione' . Puoi anche ricercare per parola chiave nel titolo anteponendo il carattere ?. Verrà interrogato il DataBase openData utilizzabile con licenza CC-BY-SA presente su https://dati.regione.sicilia.it/dataset/strutture-ricettive. In qualsiasi momento scrivendo /start ti ripeterò questo messaggio di benvenuto.\nQuesto bot è stato realizzato da @piersoft con il valido aiuto di @cirospataro e potete migliorare il codice sorgente con licenza MIT che trovate su https://github.com/piersoft/dovedormireinsiciliabot.\nLa propria posizione viene ricercata grazie al geocoder di openStreetMap con Lic. odbl. \nImmagine da Wikipedia Lic. CC-BY-SA https://it.wikipedia.org/wiki/File:Sicily_topographic_map-blank.svg";
+		$reply = "Benvenuto. Per ricercare una struttura ricettiva della Regione Siciliana, censita dal Dipartimento regionale del turismo dello sport e dello spettacolo, digita il nome del Comune oppure clicca sulla graffetta (📎) e poi 'posizione' . Puoi anche ricercare per parola chiave nel titolo anteponendo il carattere ?. Verrà interrogato il DataBase openData utilizzabile con licenza CC-BY-SA presente su https://dati.regione.sicilia.it/dataset/strutture-ricettive. In qualsiasi momento scrivendo /start ti ripeterò questo messaggio di benvenuto.\nQuesto bot è stato realizzato da @piersoft con il valido aiuto di @cirospataro e potete migliorare il codice sorgente con licenza MIT che trovate su https://github.com/piersoft/dovedormireinsiciliabot.\nLa propria posizione viene ricercata grazie al geocoder di openStreetMap con Lic. odbl. \nImmagine realizzata da Luca Corsato, Lic. MIT https://github.com/lucacorsato/dovedormireSicilia";
 		$content = array('chat_id' => $chat_id, 'text' => $reply,'disable_web_page_preview'=>true);
 		$telegram->sendMessage($content);
 		$log=$today. ",new chat started," .$chat_id. "\n";
@@ -225,7 +225,7 @@ if ($ciclo==0){
 
 	function create_keyboard_temp($telegram, $chat_id)
 	 {
-			 $option = array(["🏛 Città","❓ Ricerca"],["🌐 Posizione","©️ Informazioni"]);
+			 $option = array(["🏛 Città","❓ Ricerca"],["©️ Informazioni"]);
 			 $keyb = $telegram->buildKeyBoard($option, $onetime=false);
 			 $content = array('chat_id' => $chat_id, 'reply_markup' => $keyb, 'text' => "[Digita un Comune, fai una Ricerca (?) oppure invia la tua posizione tramite la graffetta (📎)]");
 			 $telegram->sendMessage($content);
